@@ -1,5 +1,6 @@
 'use client';
 import * as z from 'zod';
+import { useSearchParams } from 'next/navigation';
 import { LoginSchema } from '@/schemas';
 import { CardWrapper } from '@/components/auth/card-wrapper';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -20,6 +21,12 @@ import { login } from '@/actions/login';
 import { useState, useTransition } from 'react';
 
 export const LoginForm = () => {
+  const searchParams = useSearchParams();
+  const urlError =
+    searchParams.get('error') === 'OAuthAccountNotLinked'
+      ? 'email is already in use with differnt provider.'
+      : '';
+
   const [error, setError] = useState<string | undefined>('');
   const [success, setSuccess] = useState<string | undefined>('');
   const [isPending, startTransition] = useTransition();
@@ -88,7 +95,7 @@ export const LoginForm = () => {
               )}
             />
           </div>
-          <FormError message={error} />
+          <FormError message={error || urlError} />
           <FormSuccess message={success} />
           <Button disabled={isPending} className='w-full' type='submit'>
             Login
